@@ -75,22 +75,28 @@
         </section>
         <!-- Bài 4 Dual Listbox -->
         <section class="bt">
-          <h2 class="bt3">Bài tập 4: Dual Listbox</h2>
-          <div class="dualListBox">
-            <div>
-              <table></table>
+            <h2 class="bt3">Bài tập 4: Dual Listbox</h2>
+            <div id="select">
+                <div>
+                    <student-list :students="students" />
+                </div>
+                <div>
+                    <button @click="moveToRight()" class="toLeft">Sang Phải</button>
+                    <br />
+                    <button @click="moveToLeft()" class="toRight">Sang Trái</button>
+                </div>
+                <div>
+                    <student-list :students="userSelectedStudents" />
+                </div>
             </div>
-            <div></div>
-            <div>
-              <table></table>
-            </div>
-          </div>
         </section>
     </div>
 </template>
 <!--- đây là thành phần xử lý --->
 <script>
+import StudentList from "./components/StudentList.vue";
 export default {
+    components: { StudentList },
     data() {
         return {
             // Bài tập 1
@@ -133,19 +139,18 @@ export default {
             ],
 
             // Bài tập 4: Dual List Box
-            listBox1: [
-              {name: "C#"},
-              {name: "PHP"},
-              {name: "JAVA"},
-              {name: "C"},
-              {name: "JAVASCRIPT"},
+            students: [
+                { name: "Tuan", selected: false },
+                { name: "Nguyen", selected: false },
+                { name: "Thai", selected: false },
+                { name: "Peter", selected: false },
+                { name: "John", selected: false },
             ],
-            listBox2: [
-
-            ]
+            userSelectedStudents: [],
         };
     },
     computed: {
+        // Này là của bài tập 3
         selectAll: function () {
             return this.users.every(function (user) {
                 return user.checked;
@@ -153,12 +158,45 @@ export default {
         },
     },
     methods: {
+        // này của bài tập 3
         toggleSelect: function () {
             var select = this.selectAll;
             this.users.forEach(function (user) {
                 user.checked = !select;
             });
             this.selectAll = !select;
+        },
+        // Này là của bài tập 4
+        moveToRight() {
+            // đoạn này test thử
+            console.log(this.students);
+
+            // sử dụng hàm filter() để lọc ra các danh sách sinh viên có selected
+            // Lấy ra những thằng được chọn gán nó vào biến
+            let stuentsToMoveRight = this.students.filter((s) => s.selected);
+            console.log(stuentsToMoveRight);
+            // Lấy ra những thằng không được chọn
+            this.students = this.students.filter((s) => s.selected == false);
+            // đẩy những thằng được chọn vào mãng userSelectedStudents
+            // this.userSelectedStudents.push(stuentsToMoveRight) thằng này chỉ đẩy qua mãng mới (push)) được một cái thui
+            // Phương án đẩy nhiều cái dùng spread operator, cái ...
+            this.userSelectedStudents.push(...stuentsToMoveRight);
+            // Qua phải xong thì phải bỏ chọn
+            this.userSelectedStudents.forEach((s) => {
+                s.selected = false;
+            });
+        },
+
+        // copy tương tự trên cho hàm di chuyển sang lại bên trái
+        moveToLeft() {
+             console.log(this.userSelectedStudents);
+            let stuentsToMoveLeft = this.userSelectedStudents.filter((s) => s.selected);
+            this.userSelectedStudents = this.userSelectedStudents.filter((s) => s.selected == false);
+            //đẩy phần từ mãng trái qua mãng phải || this.students đại diện cho mãng phải
+            this.students.push(...stuentsToMoveLeft);
+            this.students.forEach((s) => {
+                s.selected = false;
+            });
         },
     },
 };
@@ -167,7 +205,7 @@ export default {
 <style scoped>
 .main {
     background-color: orange;
-    height: 100vh;
+    height: 100%;
     font-family: sans-serif;
 }
 .bt {
@@ -235,7 +273,17 @@ table {
 }
 
 .dualListBox {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+#select {
+    display: flex;
+    row-gap: 10px;
+    justify-content: center;
+}
+#select div {
+    border: 1px solid #000;
+    padding: 15px;
 }
 </style>
